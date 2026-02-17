@@ -1,0 +1,23 @@
+{
+  "name": "linkedin-assist-automation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "check": "node dist/run-governor-check.js",
+    "scrape": "node dist/run-scrape.js",
+    "pipeline": "node dist/run-pipeline.js",
+    "api": "node dist/api.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.41.0",
+    "express": "^4.21.0",
+    "playwright": "^1.49.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.0.0",
+    "typescript": "~5.9.2"
+  }
+}

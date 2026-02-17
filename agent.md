@@ -1,9 +1,9 @@
 # Agent Guide: LinkedIn Assistant (Agent Optimized)
 
-This is the primary entry point for AI Agents. Embark on every task by reading this and `.github/copilot-instructions.md`.
+This is the primary entry point for AI Agents. Embark on every task by reading this and `.assistant/copilot-instructions.md`.
 
 ## Core Rules & Source of Truth
-- **Primary Instructions**: `.github/copilot-instructions.md`
+- **Primary Instructions**: `.assistant/copilot-instructions.md`
 - **Active Tasks**: `todo.md` (Update status after every sub-task).
 - **Planning**: Mandatory `plan/` folder usage. Wait for "Yes chef!" before execution.
 
@@ -19,8 +19,12 @@ This is the primary entry point for AI Agents. Embark on every task by reading t
 
 ## Operational Workflow
 1. **Recon**: Search @Codebase to see if a similar pattern exists.
-2. **Plan**: Write the `plan/XXX.md` including a "Questions for User" section.
-3. **Execute**: Use @Composer for multi-file updates.
+2. **Plan (The Gate)**: 
+   - Write `plan/XXX.md`. 
+   - **MUST** include a "Critical Questions for Chef" section.
+   - **STOP**. Do not modify `src/`.3. **Execute**: Use @Composer for multi-file updates.
+   3. **Approval**: Wait for "Yes chef!"
+4. **Execute**: Only now use @Composer for multi-file updates.
 4. **Audit**: Run tests and ask for the mandatory `.spec.ts` confirmation.
-
+5. **Branch Check**: Ensure you are not on `main`. Create a `feat/` branch if necessary.
 

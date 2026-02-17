@@ -1,22 +1,30 @@
 # LinkedIn Assistant: Master Todo
 
-## Phase 1: Scaffolding & Foundation
+## Phase 1: Foundation
 - [x] 000-verify-system-rules (Instructions & Skills setup)
-- [ ] 001-setup-project-scaffolding
-    - [ ] Initialize Angular (Renaissance/Signals)
-    - [ ] Initialize Node/Playwright root
-    - [ ] Configure Strict TypeScript and Semicolon-free rules
-- [ ] 002-core-services-implementation
-    - [ ] Implement `AsyncStorageService` (Class-based Injectable)
-    - [ ] Implement `UserMsgService` (Signal-based)
-    - [ ] Implement `UtilService` (`makeId`, `jitterDelay`)
+- [x] 001-authentication (plan/001-authentication.md)
+    - [x] User model, AuthService, auth guard
+    - [x] Login page, Dashboard shell, routes
+- [x] 002-core-services (Angular)
+    - [x] AsyncStorageService
+    - [x] UserMsgService
+    - [ ] UtilService in Angular (optional; jitter lives in automation per 003)
 
-## Phase 2: Automation Core (The "Stealth" Layer)
-- [ ] 003-playwright-linkedin-auth
-- [ ] 004-profile-scraper-service
-- [ ] 005-daily-governor-logic (Strict 10-action cap)
+## Phase 2: Smart Networking (one feature at a time)
+- [x] 003-automation-foundation-governor (plan/003-automation-foundation-governor.md) — The "Plumbing"
+    - [x] automation/ project (package.json, strict tsconfig)
+    - [x] jitterDelay_(), data/stats.json
+    - [x] Daily Governor (10/day)
+    - [x] Runner script: logs "Action permitted" / "Limit reached"
+- [x] 004-stealth-scraper-auth (plan/004-stealth-scraper-auth.md) — The "Eyes"
+    - [x] Playwright, LinkedIn auth, session persistence
+    - [x] ScrapedProfile type, profile-scraper
+    - [x] Visit URL → save JSON (About/Experience)
+- [x] 005-intelligence-candidate-pipeline (plan/005-intelligence-candidate-pipeline.md) — The "Brain"
+    - [x] Gemini API, Candidate type
+    - [x] Scraped data → Gemini → candidates.json
+    - [x] Minimal GET/POST /api/candidates
 
-## Phase 3: AI & Dashboard
-- [ ] 006-gemini-integration-service
-- [ ] 007-approval-dashboard-ui
-- [ ] 008-final-human-in-the-loop-test
+## Phase 3: Approval & HITL
+- [ ] 006-approval-dashboard-ui (plan/006-approval-dashboard-ui.md) — review/edit/approve candidates
+- [ ] 007-final-human-in-the-loop-test (plan/007-final-human-in-the-loop-test.md) — Confirm & Send only after user click

@@ -1,0 +1,30 @@
+<main class="login-card">
+  <h1>LinkedIn Assistant</h1>
+  <p class="subtitle">Sign in to your dashboard</p>
+  <form (ngSubmit)="onSubmit()" class="form">
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      [ngModel]="email()"
+      (ngModelChange)="email.set($event)"
+      name="email"
+      required
+      autocomplete="email"
+      placeholder="you@example.com"
+    />
+    <label for="displayName">Display name</label>
+    <input
+      id="displayName"
+      type="text"
+      [ngModel]="displayName()"
+      (ngModelChange)="displayName.set($event)"
+      name="displayName"
+      autocomplete="name"
+      placeholder="Your name"
+    />
+    <button type="submit" [disabled]="pending()">
+      {{ pending() ? "Signing in…" : "Sign in" }}
+    </button>
+  </form>
+</main>

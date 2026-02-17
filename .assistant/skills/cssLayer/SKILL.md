@@ -1,13 +1,33 @@
-- Use modern CSS: flex, grid, prefer ems, use variables for all colors
-- Use modern CSS nesting (https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Nesting/Using) 
-- Use plain CSS files (no CSS-in-JS or CSS modules). 
-- Create a main.css under style folder and import it in the root of the app. 
-- under style folder, create the following folders: setup, basics, cmps
-   - in setup have var.css, typography.css
-   - in basics have reset.css, helper.css, layout.css, base.css, button.css
-- For component-specific styles, create a separate CSS file under style/cmps and import it from the main.css.
+---
+name: cssLayer
+description: Operational protocol for high-fidelity automation; enforces jitter, stealth movement, and a 10-action daily governor to bypass anti-bot detection.
+---
 
-- No inline styles unless absolutely necessary (such as dynamic colors in the editor)
-- Use lucide icons
+# Skill: CSS & Styling Standards
 
-- This app support light and dark themes, so use CSS variables for all colors and switch them based on the theme from the store.
+## 1. Architecture & Files
+* **Root**: `src/style/main.css` (Primary entry point imported in root).
+* **Structure**:
+    * `style/setup/`: `var.css`, `typography.css`.
+    * `style/basics/`: `reset.css`, `helper.css`, `layout.css`, `base.css`, `button.css`.
+    * `style/cmps/`: Component-specific files (Imported into `main.css`).
+* **Format**: Pure CSS only. **Prohibit** CSS-in-JS, CSS Modules, or `lang="scss"`.
+
+## 2. Modern CSS Implementation
+* **Layout**: Prioritize `display: grid` and `display: flex`.
+* **Units**: Prefer `em` and `rem` over `px`.
+* **Nesting**: Use native CSS nesting. No inline styles (except for dynamic editor values).
+* **Icons**: Use `lucide-angular` library exclusively.
+
+## 3. Theme Management
+* **Mechanism**: Use CSS Variables (`--var-name`) for all colors.
+* **Logic**: Switch theme values based on the `theme_` signal state from the store.
+* **Storage**: Define light/dark variables within `:root` or a dedicated `.theme-dark` class in `setup/var.css`.
+
+## 4. Property Ordering & Grouping
+* **Rule**: Group properties using a single blank line in this specific order:
+    1. **Layout**: `display`, `position`, `top`, `z-index`, `flex`, `grid`.
+    2. **Dimensions**: `width`, `height`, `margin`, `padding`, `border`.
+    3. **Content**: `color`, `font`, `line-height`, `text-align`.
+    4. **Structure**: `background`, `overflow`, `visibility`.
+    5. **Effects**: `transition`, `transform`, `animation`, `box-shadow`.

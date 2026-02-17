@@ -29,6 +29,12 @@ yarn-error.log
 !.vscode/mcp.json
 .history/*
 
+# Automation data (stats, auth, scraped, candidates)
+/data
+
+# Automation build
+/automation/dist
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/
