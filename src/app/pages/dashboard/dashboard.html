@@ -5,25 +5,26 @@
     @if (stats(); as s) {
       <span class="stats">{{ s.remaining }} of 10 actions remaining today</span>
     }
+    <button type="button" class="sync-btn" (click)="syncMore()" [disabled]="syncing()">{{ syncing() ? 'Syncing…' : 'Sync more' }}</button>
+    <button type="button" (click)="refresh()">Refresh candidates</button>
     <button type="button" (click)="logout()">Sign out</button>
   </header>
   <section class="content">
     @if (loading()) {
       <p class="status">Loading candidates…</p>
-    } @else if (candidates().length === 0) {
-      <p class="status">No candidates yet. Sync runs on startup — check the API terminal for <code>[sync]</code> logs. Sync may take a few minutes (LinkedIn login, discovery, scrape).</p>
+    }     @else if (pendingCandidates().length === 0) {
+      <p class="status">No pending candidates. Click "Sync more" to discover and scrape new profiles. Sent candidates are kept in the database and won't be contacted again.</p>
       <button type="button" class="refresh-btn" (click)="refresh()">Refresh candidates</button>
     } @else {
       <ul class="candidate-list">
-        @for (c of candidates(); track c._id) {
+        @for (c of pendingCandidates(); track c._id) {
           <li class="candidate-card">
             <div class="card-header">
-              <h3 class="name">{{ c.scrapedProfile.name }}</h3>
+              <h3 class="name">
+                <a [href]="c.scrapedProfile.profileUrl" target="_blank" rel="noopener noreferrer" class="profile-link">{{ displayNameFor(c) }}</a>
+              </h3>
               @if (c.status === 'approved') {
                 <span class="badge badge-approved">Approved</span>
-              }
-              @if (c.status === 'sent') {
-                <span class="badge badge-sent">Sent</span>
               }
             </div>
             <p class="about">{{ truncate(c.scrapedProfile.about) }}</p>

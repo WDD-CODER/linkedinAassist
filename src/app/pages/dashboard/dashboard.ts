@@ -19,9 +19,13 @@ export class Dashboard implements OnInit {
   protected user = this.auth.currentUser
   protected displayName = computed(() => this.auth.currentUser()?.displayName ?? this.auth.currentUser()?.email ?? 'User')
   protected candidates = this.candidatesSvc.candidates
+  protected pendingCandidates = computed(() =>
+    this.candidatesSvc.candidates().filter((c) => c.status !== 'sent')
+  )
   protected stats = this.candidatesSvc.stats
   protected loading = signal(true)
   protected sending = signal<string | null>(null)
+  protected syncing = signal(false)
   private readonly editDrafts = signal<Record<string, string>>({})
 
   protected draftDisplay(c: Candidate): string {
@@ -45,9 +49,22 @@ export class Dashboard implements OnInit {
     ]).finally(() => this.loading.set(false))
   }
 
+  protected async syncMore(): Promise<void> {
+    this.syncing.set(true)
+    await this.candidatesSvc.triggerSync()
+    this.syncing.set(false)
+  }
+
   protected truncate(text: string, max = ABOUT_MAX_LEN): string {
     if (!text) return ''
     return text.length <= max ? text : text.slice(0, max).trim() + '…'
+  }
+
+  protected displayNameFor(c: Candidate): string {
+    const name = c.scrapedProfile?.name?.trim()
+    if (name) return name
+    const match = c.scrapedProfile?.profileUrl?.match(/linkedin\.com\/in\/([^/?]+)/)
+    return match ? match[1] : 'Unknown'
   }
 
   protected onDraftBlur(c: Candidate, ev: FocusEvent): void {
@@ -71,10 +88,14 @@ export class Dashboard implements OnInit {
     if (c.status !== 'approved') return
     const remaining = this.stats()?.remaining ?? 0
     if (remaining <= 0) return
+    const messageToSend = this.draftDisplay(c)
     const confirmed = confirm(
-      `Send connection request to ${c.scrapedProfile.name}? This will send the personalized message on LinkedIn.`
+      `Send this connection message to ${this.displayNameFor(c)}?\n\n"${messageToSend}"\n\nThis will send the message on LinkedIn.`
     )
     if (!confirmed) return
+    if (messageToSend !== c.draftMessage) {
+      await this.candidatesSvc.updateCandidate(c._id, { draftMessage: messageToSend })
+    }
     this.sending.set(c._id)
     await this.candidatesSvc.sendConnection(c._id)
     this.sending.set(null)
