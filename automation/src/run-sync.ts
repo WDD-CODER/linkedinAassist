@@ -16,6 +16,7 @@ const DATA_DIR = join(__dirname, '..', '..', 'data')
 const SEARCH_TARGETS_PATH = join(DATA_DIR, 'search-targets.json')
 const SCRAPED_DIR = join(DATA_DIR, 'scraped')
 const MAX_TO_SCRAPE_PER_RUN = 10
+const PENDING_TARGET = 20
 
 interface SearchTarget {
   query: string
@@ -67,25 +68,39 @@ async function getScrapedSlugs(): Promise<Set<string>> {
 }
 
 export async function runSync(): Promise<void> {
+  console.log('[sync] Starting sync...')
+  const existingCandidates = await readCandidates()
+  const pendingCount = existingCandidates.filter((c) => c.status !== 'sent').length
+  if (pendingCount >= PENDING_TARGET) {
+    console.log('[sync]', PENDING_TARGET, 'pending candidates (draft/approved). Skipping discovery and scrape.')
+    return
+  }
+  console.log('[sync] Pending candidates:', pendingCount, '/', PENDING_TARGET)
+
   const targets = await readSearchTargets()
   if (targets.length === 0) {
     console.log('[sync] No search targets in data/search-targets.json. Add targets and restart.')
     return
   }
+  console.log('[sync] Targets:', targets.length)
 
   const scrapedSlugs = await getScrapedSlugs()
   const discoveredUrls = new Set<string>()
+  const slotsNeeded = Math.max(0, PENDING_TARGET - pendingCount)
 
   const permitted = await canPerformAction()
   if (!permitted) {
     console.log('[sync] Daily limit reached. Skipping discovery.')
   } else {
+    console.log('[sync] Logging into LinkedIn...')
     const context = await ensureLoggedIn()
     const page = await context.newPage()
     try {
       for (const target of targets) {
         try {
           const urls = await discoverProfilesFromSearch(page, target.query)
+          const newCount = urls.filter((u) => !scrapedSlugs.has(slugFromUrl(u))).length
+          console.log('[sync] Discovery "' + target.query + '": found ' + urls.length + ' profiles, ' + newCount + ' new')
           for (const url of urls) {
             const slug = slugFromUrl(url)
             if (!scrapedSlugs.has(slug)) {
@@ -96,18 +111,20 @@ export async function runSync(): Promise<void> {
           console.error('[sync] Discovery failed for', target.query, err)
         }
       }
+      console.log('[sync] Total new profiles to scrape:', discoveredUrls.size)
     } finally {
       await context.browser()?.close()
     }
   }
 
-  const toScrape = Array.from(discoveredUrls).slice(0, MAX_TO_SCRAPE_PER_RUN)
+  const toScrape = Array.from(discoveredUrls).slice(0, Math.min(MAX_TO_SCRAPE_PER_RUN, slotsNeeded))
 
   if (toScrape.length > 0) {
     const scrapePermitted = await canPerformAction()
     if (!scrapePermitted) {
       console.log('[sync] Daily limit reached. Skipping scrape.')
     } else {
+      console.log('[sync] Scraping', toScrape.length, 'profiles...')
       const context = await ensureLoggedIn()
       const page = await context.newPage()
       try {
@@ -132,7 +149,6 @@ export async function runSync(): Promise<void> {
     }
   }
 
-  const existingCandidates = await readCandidates()
   const existingUrls = new Set(existingCandidates.map((c) => c.scrapedProfile.profileUrl))
 
   let scrapedFiles: string[] = []
@@ -142,13 +158,19 @@ export async function runSync(): Promise<void> {
       .filter((n) => n.endsWith('.json'))
       .map((n) => join(SCRAPED_DIR, n))
   } catch {
+    console.log('[sync] No scraped profiles yet. Discovery found 0 profiles or no data/scraped.')
+    return
+  }
+  if (scrapedFiles.length === 0) {
+    console.log('[sync] No scraped profiles to convert to candidates.')
     return
   }
 
+  console.log('[sync] Creating candidates from', scrapedFiles.length, 'scraped profiles...')
+  let pendingNow = pendingCount
   for (const file of scrapedFiles) {
-    const permitted = await canPerformAction()
-    if (!permitted) {
-      console.log('[sync] Limit reached. Stopping pipeline.')
+    if (pendingNow >= PENDING_TARGET) {
+      console.log('[sync] Reached', PENDING_TARGET, 'pending candidates. Stopping pipeline.')
       break
     }
     const raw = await readFile(file, 'utf-8')
@@ -157,17 +179,25 @@ export async function runSync(): Promise<void> {
       continue
     }
     try {
-      const draftMessage = await generateDraft(profile)
+      let draftMessage: string
+      try {
+        draftMessage = await generateDraft(profile)
+      } catch (err) {
+        console.warn('[sync] Gemini failed for', profile.name, '- using fallback draft')
+        draftMessage = `Hi${profile.name ? ` ${profile.name}` : ''}, I'd like to connect.`
+      }
       await appendCandidate({
         scrapedProfile: profile,
         draftMessage,
         status: 'draft'
       })
-      await recordAction()
       existingUrls.add(profile.profileUrl)
-      console.log('[sync] Candidate created for', profile.name)
+      pendingNow++
+      console.log('[sync] Candidate created for', profile.name || profile.profileUrl)
     } catch (err) {
       console.error('[sync] Failed to create candidate for', profile.name, err)
     }
   }
+  const total = await readCandidates()
+  console.log('[sync] Sync complete. Total candidates:', total.length)
 }
