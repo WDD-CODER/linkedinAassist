@@ -6,7 +6,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 const STATS_PATH = join(__dirname, '..', '..', 'data', 'stats.json')
-const LIMIT = 10
+export const GOVERNOR_LIMIT = 10
+const LIMIT = GOVERNOR_LIMIT
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000
 
 export interface GovernorStats {
@@ -74,6 +75,18 @@ export async function recordAction(): Promise<void> {
   }
   stats.action_count_ += 1
   await writeStats(stats)
+}
+
+/**
+ * Get current stats for API (actionCount, remaining, lastReset).
+ */
+export async function getStats(): Promise<{ actionCount: number; remaining: number; lastReset: string }> {
+  const state = await getState()
+  return {
+    actionCount: state.count,
+    remaining: Math.max(0, LIMIT - state.count),
+    lastReset: new Date((await readStats()).last_reset_timestamp_).toISOString()
+  }
 }
 
 /**

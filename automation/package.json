@@ -8,11 +8,14 @@
     "check": "node dist/run-governor-check.js",
     "scrape": "node dist/run-scrape.js",
     "pipeline": "node dist/run-pipeline.js",
-    "api": "node dist/api.js"
+    "api": "node dist/api.js",
+    "api:start": "npm run build && node dist/api.js"
   },
   "dependencies": {
     "@google/genai": "^1.41.0",
+    "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "pdf-parse": "^1.1.1",
     "playwright": "^1.49.0"
   },
   "devDependencies": {

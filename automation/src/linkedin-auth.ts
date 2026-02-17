@@ -53,7 +53,7 @@ export async function ensureLoggedIn(): Promise<BrowserContext> {
     await jitterDelay_()
     await page.getByLabel('Password').fill(password)
     await jitterDelay_()
-    await page.getByRole('button', { name: 'Sign in' }).click()
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click()
     await page.waitForURL(/linkedin\.com\/(feed|mynetwork)/, { timeout: 30000 }).catch(() => {})
     await context.storageState({ path: statePath })
   }

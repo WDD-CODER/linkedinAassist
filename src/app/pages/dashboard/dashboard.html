@@ -2,9 +2,63 @@
   <header class="header">
     <h1>Dashboard</h1>
     <p class="welcome">Welcome, {{ displayName() }}</p>
+    @if (stats(); as s) {
+      <span class="stats">{{ s.remaining }} of 10 actions remaining today</span>
+    }
     <button type="button" (click)="logout()">Sign out</button>
   </header>
   <section class="content">
-    <p>Review and approve connection requests here. (More features coming next.)</p>
+    @if (loading()) {
+      <p class="status">Loading candidates…</p>
+    } @else if (candidates().length === 0) {
+      <p class="status">No candidates yet. Sync runs on startup — check the API terminal for <code>[sync]</code> logs. Sync may take a few minutes (LinkedIn login, discovery, scrape).</p>
+      <button type="button" class="refresh-btn" (click)="refresh()">Refresh candidates</button>
+    } @else {
+      <ul class="candidate-list">
+        @for (c of candidates(); track c._id) {
+          <li class="candidate-card">
+            <div class="card-header">
+              <h3 class="name">{{ c.scrapedProfile.name }}</h3>
+              @if (c.status === 'approved') {
+                <span class="badge badge-approved">Approved</span>
+              }
+              @if (c.status === 'sent') {
+                <span class="badge badge-sent">Sent</span>
+              }
+            </div>
+            <p class="about">{{ truncate(c.scrapedProfile.about) }}</p>
+            <label class="draft-label">Draft message</label>
+            <textarea
+              class="draft-textarea"
+              [value]="draftDisplay(c)"
+              (input)="onDraftInput(c._id, $event)"
+              (blur)="onDraftBlur(c, $event)"
+              rows="4"
+              placeholder="Edit the connection message…"
+            ></textarea>
+            <div class="card-actions">
+              <button
+                type="button"
+                class="approve-btn"
+                [disabled]="c.status === 'approved'"
+                (click)="approve(c)"
+              >
+                {{ c.status === 'approved' ? 'Approved' : 'Approve' }}
+              </button>
+              @if (c.status === 'approved') {
+                <button
+                  type="button"
+                  class="send-btn"
+                  [disabled]="(stats()?.remaining ?? 0) <= 0 || sending() === c._id"
+                  (click)="confirmAndSend(c)"
+                >
+                  {{ sending() === c._id ? 'Sending…' : 'Confirm & Send' }}
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
   </section>
 </main>

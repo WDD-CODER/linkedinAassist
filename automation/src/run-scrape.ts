@@ -1,3 +1,4 @@
+import './load-env.js'
 import { canPerformAction, recordAction } from './daily-governor.js'
 import { ensureLoggedIn } from './linkedin-auth.js'
 import { scrapeProfile, saveScrapedProfile } from './profile-scraper.js'

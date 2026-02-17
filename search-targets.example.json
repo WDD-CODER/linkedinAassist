@@ -1,0 +1,9 @@
+{
+  "targets": [
+    { "query": "recruiter software developer", "priority": 1 },
+    { "query": "technical recruiter", "priority": 1 },
+    { "query": "hiring manager developer", "priority": 2 },
+    { "query": "engineering manager tech", "priority": 2 },
+    { "query": "tech lead software", "priority": 3 }
+  ]
+}

@@ -29,6 +29,9 @@ yarn-error.log
 !.vscode/mcp.json
 .history/*
 
+# Environment (secrets)
+.env
+
 # Automation data (stats, auth, scraped, candidates)
 /data
 

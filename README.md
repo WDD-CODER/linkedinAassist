@@ -1,6 +1,50 @@
 # LinkedinAssist
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+A LinkedIn assistant that scrapes profiles, generates personalized connection drafts with Gemini, and lets you approve and send them—with a 10/day limit and full human-in-the-loop control.
+
+## Getting Started
+
+Candidates are **not** created automatically. Sync runs automatically on startup. Here’s the flow:
+
+### 1. Environment variables
+
+Fill in your `.env` file with:
+
+- `LINKEDIN_EMAIL`, `LINKEDIN_PASSWORD` — for scraping (first run only; session is saved)
+- `GEMINI_API_KEY` — for generating draft messages
+- `CV_PATH` — path to your resume (PDF or TXT) for personalized drafts
+
+### 2. Add search targets
+
+Copy `search-targets.example.json` to `data/search-targets.json`:
+
+```bash
+# Windows PowerShell
+mkdir data 2>$null; copy search-targets.example.json data\search-targets.json
+
+# macOS / Linux
+mkdir -p data; cp search-targets.example.json data/search-targets.json
+```
+
+Edit `data/search-targets.json` to add LinkedIn search queries (recruiters, hiring managers, etc.). The app discovers profiles automatically from these searches.
+
+### 3. Install and start
+
+From the project root:
+
+```bash
+npm install
+cd automation
+npm install
+cd ..
+npm start
+```
+
+This starts both the Angular app and the API server. **Sync runs automatically** on startup: it discovers profiles from your search targets, scrapes them, generates CV-personalized drafts with Gemini, and populates candidates.
+
+Open `http://localhost:4200/`, log in, and go to the dashboard. Candidates appear automatically. Edit, approve, then click **Confirm & Send** when ready.
+
+---
 
 ## Development server
 

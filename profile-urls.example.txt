@@ -1,0 +1,5 @@
+# Add LinkedIn profile URLs here, one per line.
+# Lines starting with # are ignored.
+# Example:
+# https://www.linkedin.com/in/satya-nadella
+# https://www.linkedin.com/in/reidhoffman

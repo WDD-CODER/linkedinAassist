@@ -74,9 +74,7 @@ Candidates with draft messages are stored in `data/candidates.json` and served v
 
 ## Open decisions
 
-**1. Edit UX**
+**1. Edit UX** — *Decided: Option A*
 
-- **Option A:** Inline textarea with save on blur or debounced (e.g. 500ms after typing stops).
-- **Option B:** Edit in a modal/dialog.
-
-Recommendation: Option A for simplicity; can enhance later.
+- **Option A (chosen):** Inline textarea with save on blur or debounced (e.g. 500ms after typing stops).
+- Option B: Edit in a modal/dialog.

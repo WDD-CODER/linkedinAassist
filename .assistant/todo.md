@@ -26,5 +26,5 @@
     - [x] Minimal GET/POST /api/candidates
 
 ## Phase 3: Approval & HITL
-- [ ] 006-approval-dashboard-ui (plan/006-approval-dashboard-ui.md) — review/edit/approve candidates
-- [ ] 007-final-human-in-the-loop-test (plan/007-final-human-in-the-loop-test.md) — Confirm & Send only after user click
+- [x] 006-approval-dashboard-ui (plan/006-approval-dashboard-ui.md) — review/edit/approve candidates
+- [x] 007-final-human-in-the-loop-test (plan/007-final-human-in-the-loop-test.md) — Confirm & Send only after user click

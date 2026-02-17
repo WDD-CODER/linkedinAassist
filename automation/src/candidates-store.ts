@@ -41,3 +41,20 @@ export async function writeCandidates(candidates: Candidate[]): Promise<void> {
   await ensureDataDir()
   await writeFile(CANDIDATES_PATH, JSON.stringify(candidates, null, 2), 'utf-8')
 }
+
+export async function updateCandidate(
+  id: string,
+  partial: Partial<Pick<Candidate, 'draftMessage' | 'status'>>
+): Promise<Candidate | null> {
+  const list = await readCandidates()
+  const idx = list.findIndex((c) => c._id === id)
+  if (idx < 0) return null
+  list[idx] = { ...list[idx], ...partial }
+  await writeCandidates(list)
+  return list[idx]
+}
+
+export async function getCandidateById(id: string): Promise<Candidate | null> {
+  const list = await readCandidates()
+  return list.find((c) => c._id === id) ?? null
+}

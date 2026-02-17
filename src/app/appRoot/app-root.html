@@ -1,1 +1,7 @@
+@if (msg.msg_(); as m) {
+  <div class="toast toast-{{ m.type }}" role="alert">
+    {{ m.txt }}
+    <button type="button" (click)="msg.CloseMsg()" aria-label="Close">×</button>
+  </div>
+}
 <router-outlet />

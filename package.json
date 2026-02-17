@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "concurrently \"ng serve\" \"npm run api:start --prefix automation\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -33,6 +33,7 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "concurrently": "^9.1.0",
     "@angular/build": "^21.1.4",
     "@angular/cli": "^21.1.4",
     "@angular/compiler-cli": "^21.1.0",

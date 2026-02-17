@@ -1,3 +1,4 @@
+import './load-env.js'
 import { readdir, readFile } from 'fs/promises'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'

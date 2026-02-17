@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { RouterOutlet } from '@angular/router'
+import { UserMsgService } from '../../core/services/user-msg.service'
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,5 @@ import { RouterOutlet } from '@angular/router'
   styleUrl: './app-root.css'
 })
 export class AppRoot {
-  protected readonly title = signal('linkedin-assist')
+  protected readonly msg = inject(UserMsgService)
 }

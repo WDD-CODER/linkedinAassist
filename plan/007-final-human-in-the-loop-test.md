@@ -76,16 +76,12 @@ The project's core principle: **nothing is sent without user confirmation**. 006
 
 ## Open decisions
 
-**1. Confirmation dialog**
+**1. Confirmation dialog** — *Decided: Option B*
 
-- **Option A:** Single click on "Confirm & Send" triggers send immediately.
-- **Option B:** Show a confirmation dialog ("Are you sure? This will send the connection request.") before sending.
+- Option A: Single click triggers send immediately.
+- **Option B (chosen):** Show confirmation dialog before sending.
 
-Recommendation: Option B for safety; user explicitly confirms twice (approve + confirm & send).
+**2. Stats in UI** — *Decided: Option A*
 
-**2. Stats in UI**
-
-- **Option A:** Fetch `GET /api/stats` on dashboard load; show "X of 10 actions remaining today" and disable "Confirm & Send" when 0.
-- **Option B:** Only show error after user clicks (simpler; API still rejects).
-
-Recommendation: Option A for better UX; user knows upfront if they can send.
+- **Option A (chosen):** Fetch `GET /api/stats` on load; show "X of 10 actions remaining today"; disable "Confirm & Send" when 0.
+- Option B: Only show error after user clicks.
