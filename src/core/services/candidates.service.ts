@@ -27,6 +27,17 @@ export class CandidatesService {
     }
   }
 
+  async triggerSync(): Promise<boolean> {
+    try {
+      await firstValueFrom(this.http.post<{ message: string }>(`${environment.apiBaseUrl}/api/sync`, {}))
+      this.msg.onSetSuccessMsg('Sync started. Check API terminal for progress.')
+      return true
+    } catch {
+      this.msg.onSetErrorMsg('Failed to start sync')
+      return false
+    }
+  }
+
   async loadStats(): Promise<void> {
     try {
       const data = await firstValueFrom(

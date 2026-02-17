@@ -1,4 +1,6 @@
 import './load-env.js'
+import { execSync } from 'child_process'
+import { platform } from 'os'
 import express from 'express'
 import {
   readCandidates,
@@ -14,6 +16,15 @@ import type { Candidate } from './types.js'
 const app = express()
 const PORT = process.env.API_PORT ? parseInt(process.env.API_PORT, 10) : 3750
 
+app.use((_req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  if (_req.method === 'OPTIONS') return res.sendStatus(204)
+  next()
+})
+
+let syncInProgress = false
 app.use(express.json())
 
 app.get('/api/candidates', async (_req, res) => {
@@ -75,6 +86,18 @@ app.post('/api/candidates', async (req, res) => {
   }
 })
 
+app.post('/api/sync', async (_req, res) => {
+  if (syncInProgress) {
+    res.status(429).json({ error: 'Sync already in progress' })
+    return
+  }
+  syncInProgress = true
+  res.json({ message: 'Sync started. Check API terminal for progress.' })
+  runSync()
+    .catch((err) => console.error('[sync]', err))
+    .finally(() => { syncInProgress = false })
+})
+
 app.post('/api/candidates/:id/send', async (req, res) => {
   try {
     const { id } = req.params
@@ -102,7 +125,27 @@ app.post('/api/candidates/:id/send', async (req, res) => {
   }
 })
 
-app.listen(PORT, () => {
-  console.log('Candidates API listening on', PORT)
-  runSync().catch((err) => console.error('[sync]', err))
-})
+function killPort(port: number): void {
+  try {
+    if (platform() === 'win32') {
+      execSync(
+        `powershell -Command "Get-NetTCPConnection -LocalPort ${port} -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"`,
+        { stdio: 'ignore' }
+      )
+    } else {
+      execSync(`lsof -ti:${port} | xargs kill -9 2>/dev/null || true`, { stdio: 'ignore' })
+    }
+  } catch {
+    /* port may be free */
+  }
+  setTimeout(startServer, 1500)
+}
+
+function startServer(): void {
+  app.listen(PORT, () => {
+    console.log('Candidates API listening on', PORT)
+    console.log('Run sync manually: POST /api/sync or click "Sync more" on dashboard')
+  })
+}
+
+killPort(PORT)
